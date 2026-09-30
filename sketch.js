@@ -22,9 +22,9 @@ function running() {
 }
 
 function update() {
-  const detectorOneRange = r.GetScreenWidth() / 2;
-  const detectorTwoRange = r.GetScreenWidth() / 2;
-  const verticalDetectorRange = r.GetScreenHeight();
+  const detectorOneRange = WIDTH / 2;
+  const detectorTwoRange = WIDTH / 2;
+  const verticalDetectorRange = HEIGHT;
 
   d1.velocity = isInBounds(
     d1.x,
@@ -67,28 +67,36 @@ function getcolor(overlaped) {
 }
 
 function draw() {
-  const particle1X = 100;
-  const particle1Y = 0;
-  const particle1Width = 50;
+  const particle1 = { x: 100, y: 0, width: 50, height: HEIGHT };
+  const particle2 = { x: 400, y: 0, width: 80, height: HEIGHT };
+  const verticalParticle = { x: 0, y: 200, width: WIDTH, height: 70 };
 
-  const particle2X = 400;
-  const particle2Y = 0;
-  const particle2Width = 100;
+  const detector1 = { x: d1.x, y: d1.y, width: d1.width, height: HEIGHT };
+  const detector2 = {
+    x: detectorTwoX,
+    y: d2.y,
+    width: d2.width,
+    height: HEIGHT,
+  };
+  const verticalDetector = {
+    x: vd.x,
+    y: vd.y,
+    width: WIDTH,
+    height: vd.height,
+  };
 
-  const verticalParticleX = 0;
-  const verticalParticleY = 90;
-  const verticalParticleHeight = 50;
+  const color = r.BLUE;
 
   const detectorOneColor = getcolor(
-    isInBounds(particle1X, particle1Width, d1.x, d1.width) ||
-      isInBounds(particle2X, particle2Width, d1.x, d1.width),
+    isInBounds(particle1.x, particle1.width, d1.x, d1.width) ||
+      isInBounds(particle2.x, particle2.width, d1.x, d1.width),
   );
   const detectorTwoColor = getcolor(
-    isInBounds(particle2X, particle2Width, detectorTwoX, d2.width) ||
-      isInBounds(particle1X, particle1Width, detectorTwoX, d2.width),
+    isInBounds(particle2.x, particle2.width, detectorTwoX, d2.width) ||
+      isInBounds(particle1.x, particle1.width, detectorTwoX, d2.width),
   );
   const verticalDetectorColor = getcolor(
-    isInBounds(verticalParticleY, verticalParticleHeight, vd.y, vd.height),
+    isInBounds(verticalParticle.y, verticalParticle.height, vd.y, vd.height),
   );
 
   r.BeginDrawing();
@@ -96,43 +104,13 @@ function draw() {
 
   r.DrawText("Hemanth", 10, 150, 10, r.GREEN);
 
-  r.DrawRectangle(
-    particle2X,
-    particle2Y,
-    particle2Width,
-    r.GetScreenHeight(),
-    r.BLUE,
-  );
-  r.DrawRectangle(
-    particle1X,
-    particle1Y,
-    particle1Width,
-    r.GetScreenHeight(),
-    r.BLUE,
-  );
-  r.DrawRectangle(
-    verticalParticleX,
-    verticalParticleY,
-    r.GetScreenWidth(),
-    verticalParticleHeight,
-    r.BLUE,
-  );
+  r.DrawRectangleRec(particle1, color);
+  r.DrawRectangleRec(particle2, color);
+  r.DrawRectangleRec(verticalParticle, color);
 
-  r.DrawRectangle(d1.x, d1.y, d1.width, r.GetScreenHeight(), detectorOneColor);
-  r.DrawRectangle(
-    detectorTwoX,
-    d2.y,
-    d2.width,
-    r.GetScreenHeight(),
-    detectorTwoColor,
-  );
-  r.DrawRectangle(
-    vd.x,
-    vd.y,
-    r.GetScreenWidth(),
-    vd.height,
-    verticalDetectorColor,
-  );
+  r.DrawRectangleRec(detector1, detectorOneColor);
+  r.DrawRectangleRec(detector2, detectorTwoColor);
+  r.DrawRectangleRec(verticalDetector, verticalDetectorColor);
 
   r.EndDrawing();
 }
