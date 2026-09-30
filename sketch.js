@@ -108,10 +108,9 @@ function draw() {
   r.DrawRectangleRec(particle2, color);
   r.DrawRectangleRec(verticalParticle, color);
 
-  r.DrawRectangleRounded(detector1, 0.3, 8, detectorOneColor);
-  // r.DrawRectangleRec(detector1, detectorOneColor);
-  // r.DrawRectangleRec(detector2, detectorTwoColor);
-  // r.DrawRectangleRec(verticalDetector, verticalDetectorColor);
+  r.DrawRectangleRec(detector1, detectorOneColor);
+  r.DrawRectangleRec(detector2, detectorTwoColor);
+  r.DrawRectangleRec(verticalDetector, verticalDetectorColor);
 
   r.EndDrawing();
 }
