@@ -4,8 +4,8 @@ const d1 = require("./d1.js");
 const d2 = require("./d2.js");
 const vd = require("./vd.js");
 
-const WIDTH = 700;
-const HEIGHT = 400;
+const WIDTH = 1000;
+const HEIGHT = 800;
 const FPS = 60;
 const TITLE = "scanning for particles";
 
@@ -16,6 +16,7 @@ function setup() {
 }
 
 let detectorTwoX = WIDTH / 2;
+const DetecorTwostart = detectorTwoX;
 
 function running() {
   return !r.WindowShouldClose();
@@ -37,7 +38,7 @@ function update() {
   d2.velocity = isInBounds(
     detectorTwoX,
     d2.width - d2.width,
-    d2.start,
+    DetecorTwostart,
     detectorTwoRange - d2.width,
   )
     ? d2.velocity
@@ -63,13 +64,24 @@ function isInBounds(start1, width1, start2, width2) {
   return !(end2 < start1 || start2 > end1);
 }
 function getcolor(overlaped) {
-  return overlaped ? r.Fade(r.RED, 0.7) : r.WHITE;
+  return overlaped ? r.RED : detectorColorIfNotDetected;
 }
+const detectorColorIfNotDetected = {
+  r: 255,
+  g: 255,
+  b: 255,
+  a: 150,
+};
 
 function draw() {
-  const particle1 = { x: 100, y: 0, width: 50, height: HEIGHT };
-  const particle2 = { x: 400, y: 0, width: 80, height: HEIGHT };
-  const verticalParticle = { x: 0, y: 200, width: WIDTH, height: 70 };
+  const particle1 = { x: WIDTH / 3, y: 0, width: 70, height: HEIGHT };
+  const particle2 = { x: (WIDTH / 4) * 3, y: 0, width: 100, height: HEIGHT };
+  const verticalParticle = {
+    x: 0,
+    y: (HEIGHT / 3) * 2,
+    width: WIDTH,
+    height: 100,
+  };
 
   const detector1 = { x: d1.x, y: d1.y, width: d1.width, height: HEIGHT };
   const detector2 = {
@@ -84,35 +96,81 @@ function draw() {
     width: WIDTH,
     height: vd.height,
   };
+  const paricleColor = r.BLUE;
 
-  const color = r.BLUE;
+  const detectorRoundness = 0.8;
+  const detectorSegements = 8;
 
-  const detectorOneColor = getcolor(
+  const detectorOneDetected =
     isInBounds(particle1.x, particle1.width, d1.x, d1.width) ||
-      isInBounds(particle2.x, particle2.width, d1.x, d1.width),
-  );
-  const detectorTwoColor = getcolor(
+    isInBounds(particle2.x, particle2.width, d1.x, d1.width);
+
+  const detectorTwoDtected =
     isInBounds(particle2.x, particle2.width, detectorTwoX, d2.width) ||
-      isInBounds(particle1.x, particle1.width, detectorTwoX, d2.width),
+    isInBounds(particle1.x, particle1.width, detectorTwoX, d2.width);
+
+  const verticalDetectorDetcted = isInBounds(
+    verticalParticle.y,
+    verticalParticle.height,
+    vd.y,
+    vd.height,
   );
-  const verticalDetectorColor = getcolor(
-    isInBounds(verticalParticle.y, verticalParticle.height, vd.y, vd.height),
-  );
+
+  const detectorOneColor = getcolor(detectorOneDetected);
+  const detectorTwoColor = getcolor(detectorTwoDtected);
+  const verticalDetectorColor = getcolor(verticalDetectorDetcted);
+
+  const blinkingSpeed = 6;
 
   r.BeginDrawing();
   r.ClearBackground(r.BLACK);
 
   r.DrawText("Hemanth", 10, 150, 10, r.GREEN);
 
-  r.DrawRectangleRec(particle1, color);
-  r.DrawRectangleRec(particle2, color);
-  r.DrawRectangleRec(verticalParticle, color);
+  r.DrawRectangleRec(particle1, paricleColor);
+  r.DrawRectangleRec(particle2, paricleColor);
+  r.DrawRectangleRec(verticalParticle, paricleColor);
 
-  r.DrawRectangleRec(detector1, detectorOneColor);
-  r.DrawRectangleRec(detector2, detectorTwoColor);
-  r.DrawRectangleRec(verticalDetector, verticalDetectorColor);
+  if (d1.blinker !== blinkingSpeed) {
+    r.DrawRectangleRounded(
+      detector1,
+      detectorRoundness,
+      detectorSegements,
+      detectorOneColor,
+    );
+  }
 
+  if (d2.blinker !== blinkingSpeed) {
+    r.DrawRectangleRounded(
+      detector2,
+      detectorRoundness,
+      detectorSegements,
+      detectorTwoColor,
+    );
+  }
+
+  if (vd.blinker !== blinkingSpeed) {
+    r.DrawRectangleRounded(
+      verticalDetector,
+      detectorRoundness,
+      detectorSegements,
+      verticalDetectorColor,
+    );
+  }
+
+  if (detectorOneDetected || detectorTwoDtected || verticalDetectorDetcted) {
+    r.DrawText("Warning ! ", WIDTH / 2 - 80, 5, 60, r.RED);
+  }
+
+  d1.blinker = blinkCheck(d1.blinker, detectorOneDetected, blinkingSpeed);
+  d2.blinker = blinkCheck(d2.blinker, detectorTwoDtected, blinkingSpeed);
+  vd.blinker = blinkCheck(vd.blinker, verticalDetectorDetcted, blinkingSpeed);
   r.EndDrawing();
+}
+function blinkCheck(blinker, detectorDetected, blinkingSpeed) {
+  return !detectorDetected || blinker === blinkingSpeed
+    ? (blinker = 0)
+    : ++blinker;
 }
 
 function teardown() {
