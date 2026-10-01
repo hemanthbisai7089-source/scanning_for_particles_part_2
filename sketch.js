@@ -70,7 +70,7 @@ const detectorColorIfNotDetected = {
   r: 255,
   g: 255,
   b: 255,
-  a: 150,
+  a: 26,
 };
 
 function draw() {
